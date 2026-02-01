@@ -1,22 +1,23 @@
 package org.example;
 
-import junit.framework.TestCase;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class CheckoutServiceTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    @Before
-    public void initProducts() {
 
+public class CheckoutServiceTest {
+
+    CheckoutService service;
+
+    @BeforeEach
+    public void init() {
+        service = new CheckoutService();
     }
-
-
-    CheckoutService service = new CheckoutService();
 
     @Test
     public void testToPay() {
@@ -25,7 +26,7 @@ public class CheckoutServiceTest extends TestCase {
                 "water", "water", "water", "water", "water"
         ));
 
-        Assert.assertEquals(15.0, service.toPay(cart), 0);
+        assertEquals(15.0, service.toPay(cart), 0);
 
     }
 
@@ -36,7 +37,7 @@ public class CheckoutServiceTest extends TestCase {
                 "yogurt", "yogurt"
         ));
 
-        Assert.assertEquals(5.0, service.toPay(cart), 0);
+        assertEquals(5.0, service.toPay(cart), 0);
 
     }
 
@@ -47,7 +48,8 @@ public class CheckoutServiceTest extends TestCase {
                 "yogurt", "coke"
         ));
 
-        Assert.assertEquals(5.7, service.toPay(cart), 0);
+        assertEquals(5.7, service.toPay(cart), 0);
 
     }
+
 }
