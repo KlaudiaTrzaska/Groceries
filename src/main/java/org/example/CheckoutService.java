@@ -16,10 +16,28 @@ public class CheckoutService {
     ));
 
     public double toPay(ArrayList<String> products) {
-
         double sum = 0;
+        int butterCounter = 0;
+        int tomatoCounter = 0;
         for (String product : products) {
-            sum += getPriceForProduct(product);
+            if (product.equals("butter")) {
+                butterCounter++;
+            }
+            if (product.equals("tomato")) {
+                tomatoCounter++;
+            }
+        }
+
+        for (String product : products) {
+            double price = getPriceForProduct(product);
+            if (butterCounter >= 2) {
+                sum += (price * 0.8);
+            } else {
+                sum += getPriceForProduct(product);
+            }
+        }
+        if (tomatoCounter >= 5) {
+            sum -= getPriceForProduct("tomato");
         }
         return sum;
     }
