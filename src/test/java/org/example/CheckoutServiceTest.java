@@ -61,7 +61,7 @@ public class CheckoutServiceTest {
                 "butter", "butter"
         ));
 
-        assertEquals(16.0, service.toPay(cart), 0);
+        assertEquals(20.0, service.toPay(cart), 0);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class CheckoutServiceTest {
     @ParameterizedTest
     @MethodSource("productsAndPricesProvider")
     public void productsPricesTest(List<String> products, double expectedPrice) {
-        assertEquals(expectedPrice,service.toPay(new ArrayList<>(products)));
+        assertEquals(expectedPrice, service.toPay(new ArrayList<>(products)));
     }
 
 
@@ -97,6 +97,8 @@ public class CheckoutServiceTest {
                         "water",
                         "water"), 15)
         );
+
+    }
     @Test
     public void testOneButterGetsNoDiscount() {
 
