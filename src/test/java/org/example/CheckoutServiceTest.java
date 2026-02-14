@@ -2,7 +2,6 @@ package org.example;
 
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -24,61 +23,33 @@ public class CheckoutServiceTest {
         service = new CheckoutService();
     }
 
-    @Test
-    public void testToPay() {
-
-        ArrayList<String> cart = new ArrayList<>(Arrays.asList(
-                "water", "water", "water", "water", "water"
-        ));
-
-        assertEquals(15.0, service.toPay(cart), 0);
+    @ParameterizedTest
+    @MethodSource("basketToCheckButterDiscount")
+    public void testDiscountForButters(List<String> products, double expectedPrice) {
+        assertEquals(expectedPrice, service.toPay(new ArrayList<>(products)));
+        Printer.printAReceipt(products);
     }
 
-    @Test
-    public void testToPayYogurt() {
-
-        ArrayList<String> cart = new ArrayList<>(Arrays.asList(
-                "yogurt", "yogurt"
-        ));
-
-        assertEquals(5.0, service.toPay(cart), 0);
-    }
-
-    @Test
-    public void testToPayYogurtAndCola() {
-
-        ArrayList<String> cart = new ArrayList<>(Arrays.asList(
-                "yogurt", "coke"
-        ));
-
-        assertEquals(5.7, service.toPay(cart), 0);
-    }
-
-    @Test
-    public void testToGetDiscountForTwoButters() {
-
-        ArrayList<String> cart = new ArrayList<>(Arrays.asList(
-                "butter", "butter"
-        ));
-
-        assertEquals(20.0, service.toPay(cart), 0);
-    }
-
-    @Test
-    public void testToGetDiscountForMoreThanTwoButters() {
-
-        ArrayList<String> cart = new ArrayList<>(Arrays.asList(
-                "butter", "butter", "butter"
-        ));
-
-        assertEquals(24.0, service.toPay(cart), 0);
+    private static Stream<Arguments> basketToCheckButterDiscount() {
+        return Stream.of(
+                Arguments.of(Arrays.asList(
+                        "butter",
+                        "butter"), 20.0),
+                Arguments.of(Arrays.asList(
+                        "butter",
+                        "butter",
+                        "butter"), 24.0),
+                Arguments.of(Arrays.asList(
+                        "butter"), 10.0)
+        );
     }
 
 
     @ParameterizedTest
     @MethodSource("productsAndPricesProvider")
-    public void productsPricesTest(List<String> products, double expectedPrice) {
+    public void testProductsInBasket(List<String> products, double expectedPrice) {
         assertEquals(expectedPrice, service.toPay(new ArrayList<>(products)));
+        Printer.printAReceipt(products);
     }
 
 
@@ -95,37 +66,38 @@ public class CheckoutServiceTest {
                         "water",
                         "water",
                         "water",
-                        "water"), 15)
+                        "water"), 15),
+                Arguments.of(Arrays.asList(
+                        "water",
+                        "bread",
+                        "butter",
+                        "tomato",
+                        "yogurt",
+                        "coke",
+                        "chocolate bar"
+                ), 31.4)
         );
-
-    }
-    @Test
-    public void testOneButterGetsNoDiscount() {
-
-        ArrayList<String> cart = new ArrayList<>(Arrays.asList(
-                "butter"
-        ));
-
-        assertEquals(10.0, service.toPay(cart), 0);
     }
 
-    @Test
-    public void testGetOneTomatoForFreeIfYouBuyFive() {
-
-        ArrayList<String> cart = new ArrayList<>(Arrays.asList(
-                "tomato", "tomato", "tomato", "tomato", "tomato"
-        ));
-
-        assertEquals(8.0, service.toPay(cart), 0);
+    @ParameterizedTest
+    @MethodSource("basketToCheckTomatoDiscount")
+    public void testDiscountForTomatoes(List<String> products, double expectedPrice) {
+        assertEquals(expectedPrice, service.toPay(new ArrayList<>(products)));
+        Printer.printAReceipt(products);
     }
 
-    @Test
-    public void testNoDiscountIfLessThanFiveTomatoes() {
-
-        ArrayList<String> cart = new ArrayList<>(Arrays.asList(
-                "tomato", "tomato", "tomato", "tomato"
-        ));
-
-        assertEquals(8.0, service.toPay(cart), 0);
+    private static Stream<Arguments> basketToCheckTomatoDiscount() {
+        return Stream.of(
+                Arguments.of(Arrays.asList(
+                        "tomato",
+                        "tomato",
+                        "tomato",
+                        "tomato",
+                        "tomato"), 8.0),
+                Arguments.of(Arrays.asList(
+                        "tomato",
+                        "tomato",
+                        "tomato",
+                        "tomato"), 8.0));
     }
 }

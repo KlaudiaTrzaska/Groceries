@@ -28,10 +28,6 @@ public class CheckoutService {
        for (Discounts discount : discounts){
            sum += discount.countDiscount(basket);
        }
-
-
         return sum;
     }
-
-
 }
