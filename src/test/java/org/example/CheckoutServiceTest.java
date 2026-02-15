@@ -27,7 +27,7 @@ public class CheckoutServiceTest {
     @MethodSource("basketToCheckButterDiscount")
     public void testDiscountForButters(List<String> products, double expectedPrice) {
         assertEquals(expectedPrice, service.toPay(new ArrayList<>(products)));
-        Printer.printAReceipt(products);
+        Printer.printAReceipt(new ArrayList<>(products));
     }
 
     private static Stream<Arguments> basketToCheckButterDiscount() {
@@ -49,7 +49,7 @@ public class CheckoutServiceTest {
     @MethodSource("productsAndPricesProvider")
     public void testProductsInBasket(List<String> products, double expectedPrice) {
         assertEquals(expectedPrice, service.toPay(new ArrayList<>(products)));
-        Printer.printAReceipt(products);
+        Printer.printAReceipt(new ArrayList<>(products));
     }
 
 
@@ -83,7 +83,7 @@ public class CheckoutServiceTest {
     @MethodSource("basketToCheckTomatoDiscount")
     public void testDiscountForTomatoes(List<String> products, double expectedPrice) {
         assertEquals(expectedPrice, service.toPay(new ArrayList<>(products)));
-        Printer.printAReceipt(products);
+        Printer.printAReceipt(new ArrayList<>(products));
     }
 
     private static Stream<Arguments> basketToCheckTomatoDiscount() {
