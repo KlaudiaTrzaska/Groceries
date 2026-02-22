@@ -30,4 +30,8 @@ public class CheckoutService {
        }
         return sum;
     }
+
+    public void addNewDiscount(Discounts discounts) {
+        this.discounts.add(discounts);
+    }
 }
