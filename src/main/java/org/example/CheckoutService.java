@@ -13,12 +13,20 @@ public class CheckoutService {
                 new TomatoDiscount()
         ));
 
-    public double toPay(ArrayList<String> basket) {
+    public Receipt checkout(ArrayList<String> basket) {
+
+        Receipt receipt = new Receipt();
         double sum = 0;
+        double countDiscounts = 0;
 
       List<String> discountList = discounts.stream().map(Discounts::productOnPromo).toList();
 
        for (String product : basket){
+           if (!receipt.productsMap.containsKey(product)){
+               receipt.productsMap.put(product, 1);
+           } else {
+               receipt.productsMap.replace(product, receipt.productsMap.get(product)+1);
+           }
 
            if (!discountList.contains(product)){
                sum += getPriceByName(product);
@@ -26,9 +34,12 @@ public class CheckoutService {
        }
 
        for (Discounts discount : discounts){
-           sum += discount.countDiscount(basket);
+           countDiscounts += discount.countDiscount(basket);
        }
-        return sum;
+       receipt.totalDiscounts = countDiscounts;
+       receipt.totalPrice = sum +countDiscounts;
+
+        return receipt;
     }
 
     public void addNewDiscount(Discounts discounts) {

@@ -1,30 +1,25 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Map;
 
 public class Printer {
 
-    public static void printAReceipt(ArrayList<String> basket) {
-
-        CheckoutService service = new CheckoutService();
-        double totalPrice = 0;
-        double priceWithDiscounts = service.toPay(basket);
+    public static void printAReceipt(Receipt receipt) {
 
         System.out.println("--- CHECKOUT SUMMARY ---");
 
-        for (String productName : basket) {
-            double price = Product.getPriceByName(productName);
-            System.out.printf("%-15s : %.2f PLN \n", productName, price);
-
-            totalPrice += price;
+        for (Map.Entry<String, Integer> receiptEntry : receipt.productsMap.entrySet()) {
+            double price = Product.getPriceByName(receiptEntry.getKey());
+            System.out.printf("%-15s : %.2f PLN \n", receiptEntry.getKey(), price * receiptEntry.getValue());
         }
 
-        double discountSum = totalPrice - priceWithDiscounts;
 
         System.out.println("------------------------");
-        System.out.printf("BEFORE DISCOUNT:          %.2f PLN \n", totalPrice);
-        System.out.printf("SUM OF DISCOUNTS:         %.2f PLN \n", discountSum);
-        System.out.printf("TO PAY:                   %.2f PLN \n", priceWithDiscounts);
+        System.out.printf("BEFORE DISCOUNT:          %.2f PLN \n", receipt.totalPrice + receipt.totalDiscounts);
+        System.out.printf("SUM OF DISCOUNTS:         %.2f PLN \n", receipt.totalDiscounts);
+        System.out.printf("TO PAY:                   %.2f PLN \n", receipt.totalPrice);
 
     }
 }

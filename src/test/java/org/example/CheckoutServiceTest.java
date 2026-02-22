@@ -26,8 +26,10 @@ public class CheckoutServiceTest {
     @ParameterizedTest
     @MethodSource("basketToCheckButterDiscount")
     public void testDiscountForButters(List<String> products, double expectedPrice) {
-        assertEquals(expectedPrice, service.toPay(new ArrayList<>(products)));
-        Printer.printAReceipt(new ArrayList<>(products));
+
+        Receipt receipt = service.checkout(new ArrayList<>(products));
+        assertEquals(expectedPrice, receipt.totalPrice);
+        Printer.printAReceipt(receipt);
     }
 
     private static Stream<Arguments> basketToCheckButterDiscount() {
@@ -48,8 +50,9 @@ public class CheckoutServiceTest {
     @ParameterizedTest
     @MethodSource("productsAndPricesProvider")
     public void testProductsInBasket(List<String> products, double expectedPrice) {
-        assertEquals(expectedPrice, service.toPay(new ArrayList<>(products)));
-        Printer.printAReceipt(new ArrayList<>(products));
+        Receipt receipt = service.checkout(new ArrayList<>(products));
+        assertEquals(expectedPrice, receipt.totalPrice);
+        Printer.printAReceipt(receipt);
     }
 
 
@@ -82,8 +85,9 @@ public class CheckoutServiceTest {
     @ParameterizedTest
     @MethodSource("basketToCheckTomatoDiscount")
     public void testDiscountForTomatoes(List<String> products, double expectedPrice) {
-        assertEquals(expectedPrice, service.toPay(new ArrayList<>(products)));
-        Printer.printAReceipt(new ArrayList<>(products));
+        Receipt receipt = service.checkout(new ArrayList<>(products));
+        assertEquals(expectedPrice, receipt.totalPrice);
+        Printer.printAReceipt(receipt);
     }
 
     private static Stream<Arguments> basketToCheckTomatoDiscount() {

@@ -18,7 +18,8 @@ public class Main {
         ));
 
         checkoutService.addNewDiscount(new BreadDiscount());
-        System.out.println(String.format("I'm gonna pay: %2f", checkoutService.toPay(cart)));
-        Printer.printAReceipt(cart);
+        Receipt receipt = checkoutService.checkout(cart);
+        System.out.println(String.format("I'm gonna pay: %2f", receipt.totalPrice));
+        Printer.printAReceipt(receipt);
     }
 }
