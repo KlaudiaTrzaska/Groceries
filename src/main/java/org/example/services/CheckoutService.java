@@ -1,13 +1,21 @@
-package org.example;
+package org.example.services;
+
+import org.example.ButterDiscount;
+import org.example.Discounts;
+import org.example.ProductService;
+import org.example.TomatoDiscount;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.example.Product.getPriceByName;
-
 public class CheckoutService {
 
+    public ProductService productService;
+
+    public CheckoutService() {
+        productService = new ProductService();
+    }
         ArrayList<Discounts> discounts = new ArrayList<>(Arrays.asList(
                 new ButterDiscount(),
                 new TomatoDiscount()
@@ -21,7 +29,7 @@ public class CheckoutService {
        for (String product : basket){
 
            if (!discountList.contains(product)){
-               sum += getPriceByName(product);
+               sum += productService.getPriceByName(product);
            }
        }
 

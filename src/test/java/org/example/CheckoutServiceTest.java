@@ -1,6 +1,8 @@
 package org.example;
 
 
+import org.example.services.CheckoutService;
+import org.example.services.Printer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

@@ -1,4 +1,6 @@
-package org.example;
+package org.example.services;
+
+import org.example.ProductService;
 
 import java.util.ArrayList;
 
@@ -6,6 +8,7 @@ public class Printer {
 
     public static void printAReceipt(ArrayList<String> basket) {
 
+        ProductService productService = new ProductService();
         CheckoutService service = new CheckoutService();
         double totalPrice = 0;
         double priceWithDiscounts = service.toPay(basket);
@@ -13,7 +16,7 @@ public class Printer {
         System.out.println("--- CHECKOUT SUMMARY ---");
 
         for (String productName : basket) {
-            double price = Product.getPriceByName(productName);
+            double price = productService.getPriceByName(productName);
             System.out.printf("%-15s : %.2f PLN \n", productName, price);
 
             totalPrice += price;
