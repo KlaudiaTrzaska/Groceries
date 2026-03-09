@@ -1,6 +1,7 @@
 package org.example;
 
 
+import org.example.services.CheckoutService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,10 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CheckoutServiceTest {
 
     CheckoutService service;
+    Printer printer;
 
     @BeforeEach
     public void init() {
         service = new CheckoutService();
+        printer = new Printer();
     }
 
     @ParameterizedTest
@@ -29,7 +32,7 @@ public class CheckoutServiceTest {
 
         Receipt receipt = service.checkout(new ArrayList<>(products));
         assertEquals(expectedPrice, receipt.totalPrice);
-        Printer.printAReceipt(receipt);
+        printer.printAReceipt(receipt);
     }
 
     private static Stream<Arguments> basketToCheckButterDiscount() {
@@ -52,7 +55,7 @@ public class CheckoutServiceTest {
     public void testProductsInBasket(List<String> products, double expectedPrice) {
         Receipt receipt = service.checkout(new ArrayList<>(products));
         assertEquals(expectedPrice, receipt.totalPrice);
-        Printer.printAReceipt(receipt);
+        printer.printAReceipt(receipt);
     }
 
 
@@ -87,7 +90,7 @@ public class CheckoutServiceTest {
     public void testDiscountForTomatoes(List<String> products, double expectedPrice) {
         Receipt receipt = service.checkout(new ArrayList<>(products));
         assertEquals(expectedPrice, receipt.totalPrice);
-        Printer.printAReceipt(receipt);
+        printer.printAReceipt(receipt);
     }
 
     private static Stream<Arguments> basketToCheckTomatoDiscount() {

@@ -1,17 +1,23 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
+import org.example.services.ProductService;
+
 import java.util.Map;
 
 public class Printer {
 
-    public static void printAReceipt(Receipt receipt) {
+    ProductService productService;
+
+    public Printer() {
+        this.productService = new ProductService();
+    }
+
+    public void printAReceipt(Receipt receipt) {
 
         System.out.println("--- CHECKOUT SUMMARY ---");
 
         for (Map.Entry<String, Integer> receiptEntry : receipt.productsMap.entrySet()) {
-            double price = Product.getPriceByName(receiptEntry.getKey());
+            double price = productService.getPriceByName(receiptEntry.getKey());
             System.out.printf("%-15s : %.2f PLN \n", receiptEntry.getKey(), price * receiptEntry.getValue());
         }
 
