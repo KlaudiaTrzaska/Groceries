@@ -24,7 +24,7 @@ public class Discount {
     @Column
     @Getter
     @Setter
-    private BigDecimal threshold;
+    private int threshold;
 
     @Column(name = "type_of_discount")
     @Getter
