@@ -37,4 +37,9 @@ public class Discount {
     @Getter
     @Setter
     private Double discount;
+
+    @Override
+    public String toString(){
+        return ("product name: " + this.productName + " threshold: " + this.threshold + " discount type: " + this.discountTypes + " discount: " + this.discount);
+    }
 }
