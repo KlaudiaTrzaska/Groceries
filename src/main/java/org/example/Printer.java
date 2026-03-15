@@ -1,15 +1,16 @@
 package org.example;
 
+import org.example.data.ProductDao;
 import org.example.services.ProductService;
 
 import java.util.Map;
 
 public class Printer {
 
-    ProductService productService;
+    ProductDao productDao;
 
     public Printer() {
-        this.productService = new ProductService();
+        this.productDao = new ProductDao();
     }
 
     public void printAReceipt(Receipt receipt) {
@@ -17,7 +18,7 @@ public class Printer {
         System.out.println("--- CHECKOUT SUMMARY ---");
 
         for (Map.Entry<String, Integer> receiptEntry : receipt.productsMap.entrySet()) {
-            double price = productService.getPriceByName(receiptEntry.getKey());
+            double price = productDao.getPriceByName(receiptEntry.getKey()).get();
             System.out.printf("%-15s : %.2f PLN \n", receiptEntry.getKey(), price * receiptEntry.getValue());
         }
 

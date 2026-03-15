@@ -40,24 +40,20 @@ public class Main {
         }
 
 
-//        CheckoutService checkoutService = new CheckoutService();
-//        Printer printer = new Printer();
-//        DiscountService discountService = new DiscountService();
+        CheckoutService checkoutService = new CheckoutService();
+        Printer printer = new Printer();
+        DiscountService discountService = new DiscountService();
 
-//
-//        discountService.addDiscount("butter", new BigDecimal(3), DiscountTypes.percentage, 0.2);
-//        discountService.addDiscount("tomato", new BigDecimal(5), DiscountTypes.gratis, 1);
-//
-//        ArrayList<String> cart = new ArrayList<>(Arrays.asList(
-//                "butter", "butter", "butter", "butter", "butter",
-//                "water", "water", "water",
-//                "tomato", "tomato",
-//                "bread", "bread", "bread",
-//                "chocolate bar"
-//        ));
-//
-//        Receipt receipt = checkoutService.checkout(cart);
-//        System.out.println(String.format("I'm gonna pay: %2f", receipt.totalPrice));
-//        printer.printAReceipt(receipt);
+        ArrayList<String> cart = new ArrayList<>(Arrays.asList(
+                "butter", "butter", "butter", "butter", "butter",
+                "water", "water", "water",
+                "tomato", "tomato",
+                "bread", "bread", "bread",
+                "chocolate bar"
+        ));
+
+        Receipt receipt = checkoutService.checkout(cart);
+        System.out.println(String.format("I'm gonna pay: %2f", receipt.totalPrice));
+        printer.printAReceipt(receipt);
     }
 }

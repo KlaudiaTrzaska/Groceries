@@ -4,17 +4,15 @@ import org.example.data.DiscountDao;
 import org.example.model.Discount;
 import org.example.model.DiscountTypes;
 
-import java.math.BigDecimal;
-
 public class DiscountService {
 
     private final DiscountDao discountDao;
 
-    public DiscountService( ) {
+    public DiscountService() {
         this.discountDao = new DiscountDao();
     }
 
-    public void addDiscount(String productName, BigDecimal threshold, DiscountTypes discountTypes, double discount) {
+    public void addDiscount(String productName, int threshold, DiscountTypes discountTypes, double discount) {
         Discount discount1 = new Discount();
         discount1.setProductName(productName);
         discount1.setThreshold(threshold);
@@ -22,4 +20,21 @@ public class DiscountService {
         discount1.setDiscount(discount);
         discountDao.save(discount1);
     }
+
+    public static double countDiscount(Discount product, int quantity, double price) {
+
+        if (quantity < product.getThreshold()) {
+            return quantity * price;
+        }
+
+        return switch (product.getDiscountTypes()) {
+            case percentage -> {
+                yield  quantity * price * (1 - product.getDiscount());
+            }
+            case gratis -> {
+                yield (quantity - (double) quantity / product.getThreshold()) * price;
+            }
+        };
+    }
+
 }

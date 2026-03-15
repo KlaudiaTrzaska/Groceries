@@ -6,8 +6,6 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.math.BigDecimal;
-
 @Entity
 @Table(name = "discounts")
 public class Discount {

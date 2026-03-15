@@ -1,27 +1,24 @@
 package org.example.services;
 
-import org.example.ButterDiscount;
-import org.example.Discounts;
 import org.example.Receipt;
-import org.example.TomatoDiscount;
+import org.example.data.DiscountDao;
+import org.example.data.ProductDao;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class CheckoutService {
 
-    ProductService productService;
+    ProductDao productDao;
+    DiscountDao discountDao;
 
     public CheckoutService() {
-        this.productService = new ProductService();
+        this.productDao = new ProductDao();
+        this.discountDao = new DiscountDao();
     }
 
-    ArrayList<Discounts> discounts = new ArrayList<>(Arrays.asList(
-            new ButterDiscount(),
-            new TomatoDiscount()
-    ));
 
     public Receipt checkout(ArrayList<String> basket) {
 
@@ -29,22 +26,18 @@ public class CheckoutService {
         double sum = 0;
         double countDiscounts = 0;
 
-        List<String> discountList = discounts.stream().map(Discounts::productOnPromo).toList();
+        HashMap<String, Integer> basketMap = createBasketMap(basket);
+        receipt.setProductsMap(basketMap);
 
-        for (String product : basket) {
-            if (!receipt.getProductsMap().containsKey(product)) {
-                receipt.getProductsMap().put(product, 1);
+        for (Map.Entry<String, Integer> product : basketMap.entrySet()) {
+
+            if (discountDao.getDiscountByProductName(product.getKey()).isEmpty()) {
+                sum += productDao.getPriceByName(product.getKey()).get() * product.getValue();
             } else {
-                receipt.getProductsMap().replace(product, receipt.getProductsMap().get(product) + 1);
+                countDiscounts += DiscountService.countDiscount(
+                        discountDao.getDiscountByProductName(product.getKey()).get(),
+                        product.getValue(), productDao.getPriceByName(product.getKey()).get());
             }
-
-            if (!discountList.contains(product)) {
-                sum += productService.getPriceByName(product);
-            }
-        }
-
-        for (Discounts discount : discounts) {
-            countDiscounts += discount.countDiscount(basket);
         }
         receipt.setTotalDiscounts(countDiscounts);
         receipt.setTotalPrice(sum + countDiscounts);
@@ -52,7 +45,16 @@ public class CheckoutService {
         return receipt;
     }
 
-    public void addNewDiscount(Discounts discounts) {
-        this.discounts.add(discounts);
+    public HashMap<String, Integer> createBasketMap(ArrayList<String> basket) {
+        HashMap<String, Integer> basketMap = new HashMap<>();
+
+        for (String product : basket) {
+            if (!basketMap.containsKey(product)) {
+                basketMap.put(product, 1);
+            } else {
+                basketMap.replace(product, basketMap.get(product) + 1);
+            }
+        }
+        return basketMap;
     }
 }

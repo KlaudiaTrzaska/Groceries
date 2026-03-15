@@ -1,34 +1,65 @@
 package org.example;
 
 
+import org.example.data.DiscountDao;
+import org.example.data.ProductDao;
+import org.example.model.Discount;
+import org.example.model.DiscountTypes;
 import org.example.services.CheckoutService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.lenient;
 
-
+@ExtendWith(MockitoExtension.class)
 public class CheckoutServiceTest {
 
+    @InjectMocks
     CheckoutService service;
+    @InjectMocks
     Printer printer;
+    @Mock
+    ProductDao productDao;
+    @Mock
+    DiscountDao discountDao;
+
+    Discount butterDiscount;
+    Discount tomatoDiscount;
 
     @BeforeEach
     public void init() {
-        service = new CheckoutService();
-        printer = new Printer();
+        tomatoDiscount = new Discount();
+        tomatoDiscount.setProductName("tomato");
+        tomatoDiscount.setDiscountTypes(DiscountTypes.gratis);
+        tomatoDiscount.setThreshold(5);
+        tomatoDiscount.setDiscount(1.);
+
+        butterDiscount = new Discount();
+        butterDiscount.setProductName("butter");
+        butterDiscount.setDiscountTypes(DiscountTypes.percentage);
+        butterDiscount.setThreshold(3);
+        butterDiscount.setDiscount(0.2);
     }
 
     @ParameterizedTest
     @MethodSource("basketToCheckButterDiscount")
     public void testDiscountForButters(List<String> products, double expectedPrice) {
+        lenient().when(discountDao.getDiscountByProductName("butter")).thenReturn(Optional.of(butterDiscount));
+        lenient().when(productDao.getPriceByName("butter")).thenReturn(Optional.of(10.0));
 
         Receipt receipt = service.checkout(new ArrayList<>(products));
         assertEquals(expectedPrice, receipt.totalPrice);
@@ -53,6 +84,13 @@ public class CheckoutServiceTest {
     @ParameterizedTest
     @MethodSource("productsAndPricesProvider")
     public void testProductsInBasket(List<String> products, double expectedPrice) {
+        lenient().when(productDao.getPriceByName("butter")).thenReturn(Optional.of(10.0));
+        lenient().when(productDao.getPriceByName("coke")).thenReturn(Optional.of(3.2));
+        lenient().when(productDao.getPriceByName("yogurt")).thenReturn(Optional.of(2.5));
+        lenient().when(productDao.getPriceByName("water")).thenReturn(Optional.of(3.0));
+        lenient().when(productDao.getPriceByName("chocolate bar")).thenReturn(Optional.of(4.2));
+        lenient().when(productDao.getPriceByName("bread")).thenReturn(Optional.of(6.5));
+        lenient().when(productDao.getPriceByName("tomato")).thenReturn(Optional.of(2.0));
         Receipt receipt = service.checkout(new ArrayList<>(products));
         assertEquals(expectedPrice, receipt.totalPrice);
         printer.printAReceipt(receipt);
@@ -88,6 +126,8 @@ public class CheckoutServiceTest {
     @ParameterizedTest
     @MethodSource("basketToCheckTomatoDiscount")
     public void testDiscountForTomatoes(List<String> products, double expectedPrice) {
+        lenient().when(discountDao.getDiscountByProductName("tomato")).thenReturn(Optional.of(tomatoDiscount));
+        lenient().when(productDao.getPriceByName("tomato")).thenReturn(Optional.of(2.0));
         Receipt receipt = service.checkout(new ArrayList<>(products));
         assertEquals(expectedPrice, receipt.totalPrice);
         printer.printAReceipt(receipt);
