@@ -2,15 +2,17 @@ package org.example;
 
 import org.example.data.ProductDao;
 import org.example.services.ProductService;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+@Service
 public class Printer {
 
     ProductDao productDao;
 
-    public Printer() {
-        this.productDao = new ProductDao();
+    public Printer(ProductDao productDao) {
+        this.productDao = productDao;
     }
 
     public void printAReceipt(Receipt receipt) {

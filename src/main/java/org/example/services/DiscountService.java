@@ -3,13 +3,15 @@ package org.example.services;
 import org.example.data.DiscountDao;
 import org.example.model.Discount;
 import org.example.model.DiscountTypes;
+import org.springframework.stereotype.Service;
 
+@Service
 public class DiscountService {
 
     private final DiscountDao discountDao;
 
-    public DiscountService() {
-        this.discountDao = new DiscountDao();
+    public DiscountService(DiscountDao discountDao) {
+        this.discountDao = discountDao;
     }
 
     public void addDiscount(String productName, int threshold, DiscountTypes discountTypes, double discount) {

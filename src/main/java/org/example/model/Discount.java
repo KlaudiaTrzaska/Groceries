@@ -28,7 +28,6 @@ public class Discount {
     @Getter
     @Setter
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private DiscountTypes discountTypes;
 
     @Column

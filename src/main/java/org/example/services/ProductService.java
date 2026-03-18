@@ -3,13 +3,15 @@ package org.example.services;
 
 import org.example.data.ProductDao;
 import org.example.model.Product;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ProductService {
 
     private final ProductDao productDao;
 
-    public ProductService() {
-        this.productDao = new ProductDao();
+    public ProductService(ProductDao productDao) {
+        this.productDao = productDao;
     }
 
     public double getPriceByName(String productName) {
