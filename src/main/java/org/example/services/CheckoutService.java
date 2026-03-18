@@ -3,20 +3,21 @@ package org.example.services;
 import org.example.Receipt;
 import org.example.data.DiscountDao;
 import org.example.data.ProductDao;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-
+@Service
 public class CheckoutService {
 
-    ProductDao productDao;
-    DiscountDao discountDao;
+    private final ProductDao productDao;
+    private final DiscountDao discountDao;
 
-    public CheckoutService() {
-        this.productDao = new ProductDao();
-        this.discountDao = new DiscountDao();
+    public CheckoutService(ProductDao productDao, DiscountDao discountDao) {
+        this.productDao = productDao;
+        this.discountDao = discountDao;
     }
 
 

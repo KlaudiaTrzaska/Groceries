@@ -1,21 +1,15 @@
 package org.example.data;
 
 import org.example.model.Product;
-import org.hibernate.Session;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-public class ProductDao extends BaseDao<Product, String> {
+@Repository
+public interface ProductDao extends JpaRepository<Product, String> {
 
-    public ProductDao() {
-        super(Product.class);
-    }
-
-    public Optional<Double> getPriceByName(String name) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("SELECT p.price FROM Product p WHERE p.name = :name", Double.class)
-                    .setParameter("name", name)
-                    .uniqueResultOptional();
-        }
-    }
+    @Query("SELECT p.price FROM Product p WHERE p.name = :name")
+    Optional<Double> getPriceByName(String name);
 }
