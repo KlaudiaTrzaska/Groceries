@@ -5,6 +5,8 @@ import org.example.model.Discount;
 import org.example.model.DiscountTypes;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class DiscountService {
 
@@ -31,12 +33,23 @@ public class DiscountService {
 
         return switch (product.getDiscountTypes()) {
             case percentage -> {
-                yield  quantity * price * (1 - product.getDiscount());
+                yield quantity * price * (1 - product.getDiscount());
             }
             case gratis -> {
                 yield (quantity - (double) quantity / product.getThreshold()) * price;
             }
         };
+    }
+
+    public String checkIfProductHasDiscount(String productName) {
+
+        Optional<Discount> product = discountDao.getDiscountByProductName(productName);
+
+        if (product.isPresent()) {
+            return product.get().toString();
+        }
+
+        return "Product does not exist";
     }
 
 }
