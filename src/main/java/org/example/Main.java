@@ -4,6 +4,7 @@ import org.example.data.DiscountDao;
 import org.example.model.DiscountTypes;
 import org.example.services.CheckoutService;
 import org.example.services.DiscountService;
+import org.example.services.LoyaltyService;
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
