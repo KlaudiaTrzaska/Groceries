@@ -1,11 +1,13 @@
 package org.example;
 
 
+import org.example.data.ClientDao;
 import org.example.data.DiscountDao;
 import org.example.data.ProductDao;
 import org.example.model.Discount;
 import org.example.model.DiscountTypes;
 import org.example.services.CheckoutService;
+import org.example.services.LoyaltyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +39,8 @@ public class CheckoutServiceTest {
     ProductDao productDao;
     @Mock
     DiscountDao discountDao;
+    @Mock
+    LoyaltyService loyaltyService;
 
     Discount butterDiscount;
     Discount tomatoDiscount;
@@ -60,8 +65,9 @@ public class CheckoutServiceTest {
     public void testDiscountForButters(List<String> products, double expectedPrice) {
         lenient().when(discountDao.getDiscountByProductName("butter")).thenReturn(Optional.of(butterDiscount));
         lenient().when(productDao.getPriceByName("butter")).thenReturn(Optional.of(10.0));
+        lenient().when(loyaltyService.isClientLoyal(anyString())).thenReturn(false);
 
-        Receipt receipt = service.checkout(new ArrayList<>(products));
+        Receipt receipt = service.checkout(new ArrayList<>(products), "");
         assertEquals(expectedPrice, receipt.totalPrice);
         printer.printAReceipt(receipt);
     }
@@ -91,7 +97,7 @@ public class CheckoutServiceTest {
         lenient().when(productDao.getPriceByName("chocolate bar")).thenReturn(Optional.of(4.2));
         lenient().when(productDao.getPriceByName("bread")).thenReturn(Optional.of(6.5));
         lenient().when(productDao.getPriceByName("tomato")).thenReturn(Optional.of(2.0));
-        Receipt receipt = service.checkout(new ArrayList<>(products));
+        Receipt receipt = service.checkout(new ArrayList<>(products), "");
         assertEquals(expectedPrice, receipt.totalPrice);
         printer.printAReceipt(receipt);
     }
@@ -128,7 +134,7 @@ public class CheckoutServiceTest {
     public void testDiscountForTomatoes(List<String> products, double expectedPrice) {
         lenient().when(discountDao.getDiscountByProductName("tomato")).thenReturn(Optional.of(tomatoDiscount));
         lenient().when(productDao.getPriceByName("tomato")).thenReturn(Optional.of(2.0));
-        Receipt receipt = service.checkout(new ArrayList<>(products));
+        Receipt receipt = service.checkout(new ArrayList<>(products), "");
         assertEquals(expectedPrice, receipt.totalPrice);
         printer.printAReceipt(receipt);
     }

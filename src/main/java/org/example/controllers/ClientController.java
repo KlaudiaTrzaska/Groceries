@@ -14,8 +14,8 @@ public class ClientController {
     }
 
     @GetMapping("/addClient")
-    public String addClient(@RequestParam String name, @RequestParam boolean hasCard){
-        loyaltyService.addClient(name, hasCard);
+    public String addClient(@RequestParam String name){
+        loyaltyService.addClient(name);
         return "Client " + name + " added!";
     }
 

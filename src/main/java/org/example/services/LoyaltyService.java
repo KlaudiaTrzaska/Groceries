@@ -13,10 +13,21 @@ public class LoyaltyService {
         this.clientDao = clientDao;
     }
 
-    public void addClient(String name, boolean hasLoyaltyCard){
+    public void addClient(String name) {
         Client client = new Client();
         client.setClientName(name);
-        client.setHasLoyaltyCard(hasLoyaltyCard);
         clientDao.save(client);
+    }
+
+    public boolean isClientLoyal(String phoneNumber) {
+
+        return clientDao.getClientByPhoneNumber(phoneNumber).isPresent();
+    }
+
+
+    public void addPointsForClient(String phoneNumber, int points) {
+
+        int currentPoints = clientDao.getPointsByPhoneNumber(phoneNumber).get();
+        clientDao.updatePointsByPhoneNumber(phoneNumber, currentPoints + points);
     }
 }

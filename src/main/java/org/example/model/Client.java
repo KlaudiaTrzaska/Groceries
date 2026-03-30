@@ -17,10 +17,10 @@ public class Client {
     @Setter
     private String clientName;
 
-    @Column(name = "has_card")
+    @Column(name = "phone_number")
     @Getter
     @Setter
-    private boolean hasLoyaltyCard;
+    private String phoneNumber;
 
     @Column
     @Getter
