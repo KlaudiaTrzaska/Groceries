@@ -14,10 +14,13 @@ public class ClientController {
     }
 
     @GetMapping("/addClient")
-    public String addClient(@RequestParam String name){
+    public String addClient(@RequestParam String name) {
         loyaltyService.addClient(name);
         return "Client " + name + " added!";
     }
 
-
+    @GetMapping(value = "/points/{phoneNumber}")
+    public String checkClientPoints(@PathVariable String phoneNumber) {
+        return loyaltyService.checkPointsForClient(phoneNumber);
+    }
 }
