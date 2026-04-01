@@ -4,11 +4,13 @@ package org.example;
 import org.example.data.ClientDao;
 import org.example.data.DiscountDao;
 import org.example.data.ProductDao;
+import org.example.model.Client;
 import org.example.model.Discount;
 import org.example.model.DiscountTypes;
 import org.example.services.CheckoutService;
 import org.example.services.LoyaltyService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -18,15 +20,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CheckoutServiceTest {
@@ -41,6 +44,10 @@ public class CheckoutServiceTest {
     DiscountDao discountDao;
     @Mock
     LoyaltyService loyaltyService;
+    @InjectMocks
+    LoyaltyService loyaltyServiceForTests;
+    @Mock
+    ClientDao clientDao;
 
     Discount butterDiscount;
     Discount tomatoDiscount;
@@ -152,5 +159,41 @@ public class CheckoutServiceTest {
                         "tomato",
                         "tomato",
                         "tomato"), 8.0));
+    }
+
+    @Test
+    public void testIsClientLoyal_True() {
+        when(clientDao.getClientByPhoneNumber("123")).thenReturn(Optional.of(new Client()));
+
+        boolean result = loyaltyServiceForTests.isClientLoyal("123");
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void testIsClientLoyal_False() {
+        when(clientDao.getClientByPhoneNumber("123")).thenReturn(Optional.empty());
+
+        boolean result = loyaltyServiceForTests.isClientLoyal("123");
+
+        assertFalse(result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("pointsProvider")
+    public void testAddPointsForClient(int currentPoints, double basketPrice, int expectedPoints) {
+        when(clientDao.getPointsByPhoneNumber("123")).thenReturn(Optional.of(currentPoints));
+
+        loyaltyServiceForTests.addPointsForClient("123", (int) basketPrice);
+
+        verify(clientDao).updatePointsByPhoneNumber("123", expectedPoints);
+    }
+
+    private static Stream<Arguments> pointsProvider() {
+        return Stream.of(
+                Arguments.of(0, 10.5, 10),
+                Arguments.of(5, 20.0, 25),
+                Arguments.of(10, 15.7, 25)
+        );
     }
 }
