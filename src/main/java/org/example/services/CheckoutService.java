@@ -1,6 +1,7 @@
 package org.example.services;
 
 import org.example.Receipt;
+import org.example.data.ClientDao;
 import org.example.data.DiscountDao;
 import org.example.data.ProductDao;
 import org.springframework.stereotype.Service;
@@ -14,14 +15,16 @@ public class CheckoutService {
 
     private final ProductDao productDao;
     private final DiscountDao discountDao;
+    private final LoyaltyService loyaltyService;
 
-    public CheckoutService(ProductDao productDao, DiscountDao discountDao) {
+    public CheckoutService(ProductDao productDao, DiscountDao discountDao, LoyaltyService loyaltyService) {
         this.productDao = productDao;
         this.discountDao = discountDao;
+        this.loyaltyService = loyaltyService;
     }
 
 
-    public Receipt checkout(ArrayList<String> basket) {
+    public Receipt checkout(ArrayList<String> basket, String phoneNumber) {
 
         Receipt receipt = new Receipt();
         double sum = 0;
@@ -42,6 +45,10 @@ public class CheckoutService {
         }
         receipt.setTotalDiscounts(countDiscounts);
         receipt.setTotalPrice(sum + countDiscounts);
+
+        if (loyaltyService.isClientLoyal(phoneNumber)) {
+            loyaltyService.addPointsForClient(phoneNumber, (int) receipt.getTotalPrice());
+        }
 
         return receipt;
     }
