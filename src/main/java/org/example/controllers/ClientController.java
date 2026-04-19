@@ -3,8 +3,9 @@ package org.example.controllers;
 import org.example.services.LoyaltyService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping
 public class ClientController {
 
     LoyaltyService loyaltyService;
@@ -22,5 +23,10 @@ public class ClientController {
     @GetMapping(value = "/points/{phoneNumber}")
     public String checkClientPoints(@PathVariable String phoneNumber) {
         return loyaltyService.checkPointsForClient(phoneNumber);
+    }
+
+    @GetMapping(value = "/prizes/{phoneNumber}")
+    public List<String> checkClientPrizes(@PathVariable String phoneNumber) {
+        return loyaltyService.checkPrizesForClient(phoneNumber);
     }
 }
