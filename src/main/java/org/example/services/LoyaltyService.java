@@ -19,9 +19,10 @@ public class LoyaltyService {
         this.prizeClient = prizeClient;
     }
 
-    public void addClient(String name) {
+    public void addClient(String name, String phoneNumber) {
         Client client = new Client();
         client.setClientName(name);
+        client.setPhoneNumber(phoneNumber);
         clientDao.save(client);
     }
 
