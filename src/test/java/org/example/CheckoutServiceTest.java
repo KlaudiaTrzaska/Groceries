@@ -1,9 +1,13 @@
 package org.example;
 
 
+import com.example.prizes.client.Prize;
+import com.example.prizes.client.PrizeClient;
 import org.example.data.ClientDao;
 import org.example.data.DiscountDao;
 import org.example.data.ProductDao;
+import org.example.exceptions.NoPrizeInInventoryException;
+import org.example.exceptions.NotEnoughPointsForPrizeException;
 import org.example.model.Client;
 import org.example.model.Discount;
 import org.example.model.DiscountTypes;
@@ -25,6 +29,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
@@ -48,6 +53,8 @@ public class CheckoutServiceTest {
     LoyaltyService loyaltyServiceForTests;
     @Mock
     ClientDao clientDao;
+    @Mock
+    PrizeClient prizeClient;
 
     Discount butterDiscount;
     Discount tomatoDiscount;
@@ -195,5 +202,33 @@ public class CheckoutServiceTest {
                 Arguments.of(5, 20.0, 25),
                 Arguments.of(10, 15.7, 25)
         );
+    }
+
+    @Test
+    public void testGetPrizeForClient() {
+        when(prizeClient.getPrizes()).thenReturn(List.of(new Prize("mug", 10)));
+        when(clientDao.getPointsByPhoneNumber("123")).thenReturn(Optional.of(15));
+
+        String result = loyaltyServiceForTests.getPrizeForClient("123", "mug");
+
+        assertEquals("Client received mug", result);
+    }
+
+    @Test
+    public void testGetPrizeForClient_NoPrizeInInventory() {
+        when(prizeClient.getPrizes()).thenReturn(List.of(new Prize("mug", 10)));
+        when(clientDao.getPointsByPhoneNumber("123")).thenReturn(Optional.of(15));
+
+        assertThrows(NoPrizeInInventoryException.class,
+                () -> loyaltyServiceForTests.getPrizeForClient("123", "bag"));
+    }
+
+    @Test
+    public void testGetPrizeForClient_NotEnoughPoints() {
+        when(prizeClient.getPrizes()).thenReturn(List.of(new Prize("mug", 10)));
+        when(clientDao.getPointsByPhoneNumber("123")).thenReturn(Optional.of(5));
+
+        assertThrows(NotEnoughPointsForPrizeException.class,
+                () -> loyaltyServiceForTests.getPrizeForClient("123", "mug"));
     }
 }

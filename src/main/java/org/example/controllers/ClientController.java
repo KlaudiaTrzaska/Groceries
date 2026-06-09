@@ -62,4 +62,20 @@ public class ClientController {
             @PathVariable String phoneNumber) {
         return loyaltyService.checkPrizesForClient(phoneNumber);
     }
+
+    @PostMapping(value = "/prizes/{phoneNumber}/{prizeName}")
+    @Operation(summary = "Get a prize for client", description = "Claims a prize for a client by phone number")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Prize claimed successfully",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400", description = "Client does not have enough points"),
+            @ApiResponse(responseCode = "404", description = "Prize not found in inventory")
+    })
+    public String getPrizeForClient(
+            @Parameter(description = "Phone number of the client", required = true)
+            @PathVariable String phoneNumber,
+            @Parameter(description = "Name of the prize", required = true)
+            @PathVariable String prizeName) {
+        return loyaltyService.getPrizeForClient(phoneNumber, prizeName);
+    }
 }

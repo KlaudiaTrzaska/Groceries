@@ -3,6 +3,8 @@ package org.example.services;
 import com.example.prizes.client.Prize;
 import com.example.prizes.client.PrizeClient;
 import org.example.data.ClientDao;
+import org.example.exceptions.NoPrizeInInventoryException;
+import org.example.exceptions.NotEnoughPointsForPrizeException;
 import org.example.model.Client;
 import org.springframework.stereotype.Service;
 
@@ -53,5 +55,22 @@ public class LoyaltyService {
                 .map(Prize::prizeName)
                 .toList();
 
+    }
+
+    public String getPrizeForClient(String phoneNumber, String prizeName) {
+        int clientPoints = clientDao.getPointsByPhoneNumber(phoneNumber).get();
+        List<Prize> prizes = prizeClient.getPrizes();
+
+        Prize prizeFromInventory = prizes
+                .stream()
+                .filter(prize -> prize.prizeName().equalsIgnoreCase(prizeName))
+                .findFirst()
+                .orElseThrow(() -> new NoPrizeInInventoryException(prizeName));
+
+        if (prizeFromInventory.threshold() > clientPoints) {
+            throw new NotEnoughPointsForPrizeException(prizeFromInventory.prizeName());
+        }
+
+        return "Client received " + prizeFromInventory.prizeName();
     }
 }
