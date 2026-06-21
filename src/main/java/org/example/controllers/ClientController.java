@@ -69,7 +69,9 @@ public class ClientController {
             @ApiResponse(responseCode = "200", description = "Prize claimed successfully",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}),
             @ApiResponse(responseCode = "400", description = "Client does not have enough points"),
-            @ApiResponse(responseCode = "404", description = "Prize not found in inventory")
+            @ApiResponse(responseCode = "404", description = "Prize not found in inventory"),
+            @ApiResponse(responseCode = "409", description = "Prize is out of stock",
+                    content = @Content(mediaType = "application/json", schema = @Schema(type = "string")))
     })
     public String getPrizeForClient(
             @Parameter(description = "Phone number of the client", required = true)

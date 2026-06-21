@@ -8,6 +8,7 @@ import org.example.data.DiscountDao;
 import org.example.data.ProductDao;
 import org.example.exceptions.NoPrizeInInventoryException;
 import org.example.exceptions.NotEnoughPointsForPrizeException;
+import org.example.exceptions.PrizeOutOfStockException;
 import org.example.model.Client;
 import org.example.model.Discount;
 import org.example.model.DiscountTypes;
@@ -22,6 +23,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 
 import java.util.*;
@@ -229,6 +232,16 @@ public class CheckoutServiceTest {
         when(clientDao.getPointsByPhoneNumber("123")).thenReturn(Optional.of(5));
 
         assertThrows(NotEnoughPointsForPrizeException.class,
+                () -> loyaltyServiceForTests.getPrizeForClient("123", "mug"));
+    }
+
+    @Test
+    public void testGetPrizeForClient_PrizeOutOfStock() {
+        when(prizeClient.getPrizes()).thenReturn(List.of(new Prize("mug", 10)));
+        when(clientDao.getPointsByPhoneNumber("123")).thenReturn(Optional.of(15));
+        when(prizeClient.takePrize("mug")).thenThrow(new HttpClientErrorException(HttpStatus.CONFLICT));
+
+        assertThrows(PrizeOutOfStockException.class,
                 () -> loyaltyServiceForTests.getPrizeForClient("123", "mug"));
     }
 }
