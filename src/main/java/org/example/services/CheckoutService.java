@@ -16,11 +16,14 @@ public class CheckoutService {
     private final ProductDao productDao;
     private final DiscountDao discountDao;
     private final LoyaltyService loyaltyService;
+    private final CheckoutEventPublisher checkoutEventPublisher;
 
-    public CheckoutService(ProductDao productDao, DiscountDao discountDao, LoyaltyService loyaltyService) {
+    public CheckoutService(ProductDao productDao, DiscountDao discountDao, LoyaltyService loyaltyService,
+                           CheckoutEventPublisher checkoutEventPublisher) {
         this.productDao = productDao;
         this.discountDao = discountDao;
         this.loyaltyService = loyaltyService;
+        this.checkoutEventPublisher = checkoutEventPublisher;
     }
 
 
@@ -49,6 +52,8 @@ public class CheckoutService {
         if (loyaltyService.isClientLoyal(phoneNumber)) {
             loyaltyService.addPointsForClient(phoneNumber, (int) receipt.getTotalPrice());
         }
+
+        checkoutEventPublisher.publishCompletedCheckout(receipt.getTotalPrice());
 
         return receipt;
     }
