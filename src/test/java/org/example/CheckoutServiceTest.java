@@ -12,6 +12,7 @@ import org.example.exceptions.PrizeOutOfStockException;
 import org.example.model.Client;
 import org.example.model.Discount;
 import org.example.model.DiscountTypes;
+import org.example.services.CheckoutEventPublisher;
 import org.example.services.CheckoutService;
 import org.example.services.LoyaltyService;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,6 +53,8 @@ public class CheckoutServiceTest {
     DiscountDao discountDao;
     @Mock
     LoyaltyService loyaltyService;
+    @Mock
+    CheckoutEventPublisher checkoutEventPublisher;
     @InjectMocks
     LoyaltyService loyaltyServiceForTests;
     @Mock
@@ -86,6 +89,7 @@ public class CheckoutServiceTest {
 
         Receipt receipt = service.checkout(new ArrayList<>(products), "");
         assertEquals(expectedPrice, receipt.totalPrice);
+        verify(checkoutEventPublisher).publishCompletedCheckout(expectedPrice);
         printer.printAReceipt(receipt);
     }
 
