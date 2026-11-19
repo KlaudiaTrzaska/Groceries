@@ -1,112 +1,74 @@
-# Grocieries
 
-A Spring Boot REST API for grocery checkout, quantity-based discounts, and a customer loyalty program. It stores products and customers in PostgreSQL, integrates with an external Prizes service, and publishes checkout events to Amazon SQS.
+## Local development (without AWS)
 
-## Requirements
+The application can run locally using Docker Compose
+for PostgreSQL and a Spring Boot `local` profile
+that disables the Amazon SQS integration.
 
-- Java 17 and Maven.
-- PostgreSQL reachable by the application.
-- The Maven dependency `org.example:Prizes:1.3-SNAPSHOT:client` installed in your local Maven repository or available through a configured repository. This project does not include the Prizes service or its client source; obtain the client artifact from that project before building.
-- AWS credentials with permission to send messages to the configured SQS queue.
-- A running Prizes service for prize operations, configured as required by the external `PrizeClient` library.
+### Prerequisites
 
-## Configuration
+- Java 17
+- Maven 3.9+
+- Docker Desktop
+- Prizes client artifact installed in the local
+  Maven repository
 
-Defaults are defined in [`application.properties`](src/main/resources/application.properties). Override them with environment variables for your environment:
+### Setup
 
-| Environment variable | Purpose / default |
-| --- | --- |
-| `SPRING_DATASOURCE_URL` | `jdbc:postgresql://localhost:5433/postgres` |
-| `SPRING_DATASOURCE_USERNAME` | Database user; defaults to `postgres` |
-| `SPRING_DATASOURCE_PASSWORD` | Database password; set to match your database |
-| `AWS_ACCESS_KEY_ID` | Required AWS access key |
-| `AWS_SECRET_ACCESS_KEY` | Required AWS secret key |
-| `SPRING_CLOUD_AWS_REGION_STATIC` | AWS region; defaults to `us-east-1` |
-| `AWS_SQS_ANALYTICS_QUEUE` | Queue name; defaults to `analytics-groceries-queue` |
+1. Clone the repository.
 
-For example, after supplying your database and AWS credentials:
+2. Create a local environment file:
 
-```bash
-export SPRING_DATASOURCE_URL='jdbc:postgresql://localhost:5433/postgres'
-export SPRING_DATASOURCE_USERNAME='postgres'
-export SPRING_DATASOURCE_PASSWORD='your-database-password'
-mvn spring-boot:run
-```
+   cp .env.example .env
 
-Flyway applies the migrations in `src/main/resources/db/migration` on startup. Hibernate validates the resulting schema. The migrations create tables but do not insert sample products or discounts; populate these in PostgreSQL before checking out a nonempty basket. There is no REST endpoint for creating products or discounts.
+3. Configure POSTGRES_DB, POSTGRES_USER and
+   POSTGRES_PASSWORD in .env.
 
-The API runs at `http://localhost:8080` by default.
+4. Start PostgreSQL:
 
-## API
+   docker compose up -d
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `POST` | `/checkout` | Calculate a basket receipt and publish a checkout event |
-| `GET` | `/discounts/{productName}` | Look up a product's discount |
-| `POST` | `/addClient` | Register a loyalty customer |
-| `GET` | `/points/{phoneNumber}` | Check a customer's loyalty points |
-| `GET` | `/prizes/{phoneNumber}` | List prizes within a customer's points balance |
-| `POST` | `/prizes/{phoneNumber}/{prizeName}` | Claim a prize through the Prizes service |
+5. Start the Spring Boot application:
 
-### Register a customer
+   ./run-local.sh
 
-```bash
-curl -X POST http://localhost:8080/addClient \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"John Doe","phoneNumber":"+1234567890"}'
-```
+The application is available at:
+http://localhost:8080
 
-Successful registration returns an empty response body.
+Swagger UI:
+http://localhost:8080/swagger-ui.html
 
-### Checkout
+### Database migrations
 
-The request uses [`CheckoutRequest`](src/main/java/org/example/dto/CheckoutRequest.java): `basket` is an array of product names, with repeated names representing quantities. `phoneNumber` is optional.
+Flyway automatically runs database migrations
+V1–V8 when the application starts.
 
-```bash
-curl -X POST http://localhost:8080/checkout \
-  -H 'Content-Type: application/json' \
-  -d '{"basket":["bread","butter","butter"],"phoneNumber":"+1234567890"}'
-```
+The migrations create the following business tables:
+- products
+- discounts
+- client
 
-The named products must already exist in the database. The JSON receipt contains:
+Flyway also creates flyway_schema_history.
 
-- `productsMap`: product names mapped to quantities.
-- `totalPrice`: the final basket total after applicable discounts.
-- `totalDiscounts`: the subtotal charged for products with discount records, including their applicable discounts; this field does **not** represent money saved.
+To verify the database:
 
-A registered customer receives points equal to the integer part of the final total. An omitted or null basket is treated as empty. Each checkout sends an SQS event containing `eventName` (`completed checkout`), `checkoutDate`, and `totalPrice`. Publishing happens synchronously, so an SQS failure can fail the request after loyalty points have been updated.
+docker exec groceries-postgres \
+psql -U groceries -d postgres -c "\dt"
 
-### Check points
+### Local AWS behavior
 
-```bash
-curl 'http://localhost:8080/points/%2B1234567890'
-```
+The local profile disables AWS SQS integration.
 
-Interactive API documentation is available at [Swagger UI](http://localhost:8080/swagger-ui.html), with the [OpenAPI specification](http://localhost:8080/v3/api-docs) available as JSON.
+Checkout events are logged instead of being
+published to Amazon SQS.
 
-## Build and test
+This allows local development without real
+AWS credentials or a running SQS queue.
 
-```bash
-mvn test
-mvn package
-java -jar target/Grocieries-1.0-SNAPSHOT.jar
-```
+### Known limitations
 
-The unit tests use JUnit 5 and Mockito for checkout, discount, and loyalty behavior. They mock external dependencies and do not require a running database, SQS queue, or Prizes service, but Maven still needs the Prizes client artifact to compile.
-
-## Project layout
-
-```text
-src/main/java/org/example/
-  controllers/   REST endpoints
-  dto/           Request payloads
-  services/      Checkout, discounts, loyalty, and SQS publishing
-  data/          Database repositories
-  model/         Database entities
-  events/        Checkout event payload
-  exceptions/    Prize-related errors
-src/main/resources/
-  application.properties
-  db/migration/ Flyway schema migrations
-src/test/java/  Unit tests
-```
+- Product and discount data must be seeded manually.
+- The Prizes client JAR is still required to compile.
+- Prize-related operations may require a running
+  Prizes service.
+- The local profile does not test actual SQS delivery.
